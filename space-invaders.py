@@ -19,25 +19,26 @@ def Playerimg(x, y):
     screen.blit(image1, (x, y))
 
 #Alien
-image2 = []
+# Enemy
+image2 = pygame.image.load('monster.png')
+num_of_aliens = 6
+alien_images = []
 alien_x = []
 alien_y = []
 alien_x_change = []
 alien_y_change = []
-num_of_aliens = 6
 
-for i in range(num_of_aliens):
-    image2.append(pygame.image.load('monster.png'))
-    alien_x.append(random.randint(0, 800))
-    alien_y.append(random.randint(50, 200))
-    alien_x_change.append(0.3)
-    alien_y_change.append(40)
-
+for _ in range(num_of_aliens):
+    alien_images.append(image2)  # same image for all, you could randomize if you want
+    alien_x.append(random.randint(0, 736))  # screen width - image width
+    alien_y.append(random.randint(50, 150))
+    alien_x_change.append(0.25)
+    alien_y_change.append(20)
 
 
 
-def Enemyimg(x, y, i):
-    screen.blit(image2[i], (x, y))
+def Enemyimg(x, y):
+    screen.blit(image2, (x, y))
 
 
 #collisiondetection
@@ -87,27 +88,34 @@ while running:
     if player_x <= 0:
         player_x = 0
     if player_x >= 764:
-        player_x = 768
-    for i  in range(num_of_aliens):
+        player_x = 764
+    screen.fill(Colour)
+
+    for i in range(num_of_aliens):
+    # Move enemy
         alien_x[i] += alien_x_change[i]
-        if alien_x[i] >= 784:
-            alien_x_change[i] = -0.3
-            alien_y[i] += alien_y_change[i]
-        if alien_x[i] <= 0 :
+
+        if alien_x[i] <= 0:
             alien_x_change[i] = 0.3
             alien_y[i] += alien_y_change[i]
+        elif alien_x[i] >= 736:
+            alien_x_change[i] = -0.3
+            alien_y[i] += alien_y_change[i]
+
+    # Collision
         coll = isCollision(alien_x[i], alien_y[i], bullet_x, bullet_y)
         if coll:
-            bullet_x = player_x
+            bullet_y = player_y
             bullet_state = "ready"
-            alien_x[i] = random.randint(0, 800)
-            alien_y[i] = random.randint(50, 200)
-        Enemyimg(alien_x[i], alien_y[i], i)  
+            alien_x[i] = random.randint(0, 736)
+            alien_y[i] = random.randint(50, 150)
+
+    # Draw the enemy
+        Enemyimg(alien_x[i], alien_y[i])
 
 
         
 
-    screen.fill(Colour)
     
     Playerimg(player_x, player_y)
     
@@ -115,7 +123,7 @@ while running:
         bulletimg(bullet_x, bullet_y)
         bullet_y += bullety_change
     if bullet_y <= 0:
-        bullet_x = player_x
+        bullet_y = player_y
         bullet_state = "ready"
 
    
